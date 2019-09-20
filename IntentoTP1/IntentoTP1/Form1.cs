@@ -194,7 +194,12 @@ namespace IntentoTP1
 
             }
 
+            //Mostrando en el listView
+            for (int i=0; i< listaElementosEmpacados.Count;i++) {
 
+                listBoxElementosEmpacados.Items.Add("Elemento:"+(i+1)+":"+"Largo: "+listaElementosEmpacados.ElementAt(i).largo+
+                    "Alto: "+listaElementosEmpacados.ElementAt(i).alto);
+            }
         }
 
         public void DibujarRectangulo(int x, int y, int largo, int alto)
@@ -229,6 +234,17 @@ namespace IntentoTP1
             int alto = int.Parse(txtbAltoElemento.Text);
             Elemento elemento = new Elemento(largo, alto);
             elementos.Add(elemento);
+
+            listBoxElementosAEmpacar.Items.Add("Elemento:"+ elementos.Count + "Largo: "+elementos.ElementAt(elementos.Count-1).largo+" Alto:"+elementos.ElementAt(elementos.Count - 1).alto);
+
+
+        }
+
+        private void BtnNuevo_Click(object sender, EventArgs e)
+        {
+            Form1 NewForm = new Form1();
+            NewForm.Show();
+            this.Dispose(false);
         }
     }
 }
