@@ -11,7 +11,6 @@ E:\Proyectos\Complejidad Algoritmica\IntentoTP1\IntentoTP1\obj\Debug\IntentoTP1.
 E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\bin\Debug\IntentoTP1.exe.config
 E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\bin\Debug\IntentoTP1.exe
 E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\bin\Debug\IntentoTP1.pdb
-E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\obj\Debug\IntentoTP1.csprojAssemblyReference.cache
 E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\obj\Debug\IntentoTP1.Form1.resources
 E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\obj\Debug\IntentoTP1.Properties.Resources.resources
 E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\obj\Debug\IntentoTP1.csproj.GenerateResource.cache
