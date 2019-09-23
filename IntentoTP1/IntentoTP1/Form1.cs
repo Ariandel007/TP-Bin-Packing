@@ -12,7 +12,7 @@ namespace IntentoTP1
 {
     public partial class Form1 : Form
     {
-        PosicionEspacioLibre tabla;
+        PosicionEspacioLibre plancha;
         List<Elemento> elementos = new List<Elemento>();
 
         public Form1()
@@ -44,37 +44,10 @@ namespace IntentoTP1
 
             ////Creando las lista de elementos:
 
-            //Elemento elemento1 = new Elemento(26, 32);
-            //Elemento elemento2 = new Elemento(13, 53);
-            //Elemento elemento3 = new Elemento(63, 35);
-            //Elemento elemento4 = new Elemento(47, 55);
-            //Elemento elemento5 = new Elemento(300, 120);
-            //Elemento elemento6 = new Elemento(123, 103);
-            //Elemento elemento7 = new Elemento(45, 40);
-            //Elemento elemento8 = new Elemento(54, 45);
-            //Elemento elemento9 = new Elemento(34, 10);
-            //Elemento elemento10 = new Elemento(30, 20);
-            //Elemento elemento11 = new Elemento(30, 20);
-
-
-            //elementos.Add(elemento1);
-            //elementos.Add(elemento2);
-            //elementos.Add(elemento3);
-            //elementos.Add(elemento4);
-            //elementos.Add(elemento5);
-            //elementos.Add(elemento6);
-            //elementos.Add(elemento7);
-            //elementos.Add(elemento8);
-            //elementos.Add(elemento9);
-            //elementos.Add(elemento10);
-            //elementos.Add(elemento11);
-
-            //Lista de elementos que han sido empaquetados:
-            List<Elemento> listaElementosEmpacados = new List<Elemento>();
-            //Creando la lista posiciones
+            //Creando la lista posiciones de espacios libres
 
             List<PosicionEspacioLibre> lstposicionEspacioLibres = new List<PosicionEspacioLibre>();
-            lstposicionEspacioLibres.Add(new PosicionEspacioLibre(tabla.largo, tabla.alto));
+            lstposicionEspacioLibres.Add(new PosicionEspacioLibre(plancha.largo, plancha.alto));
 
             //Lista de elementos empacados
             List<Elemento> elementosEmpacados = new List<Elemento>();
@@ -82,7 +55,6 @@ namespace IntentoTP1
 
 
             ///ACA INICIA EL ALGORITMO:
-
 
             algoritmo.determinarFactorDeEncaje(elementos, lstposicionEspacioLibres.ElementAt(0));
 
@@ -102,11 +74,11 @@ namespace IntentoTP1
             //realizar mas ordenamientos de desempate: TODO
 
 
-            //Quitar elementos mas grandes que la tabla
+            //Quitar elementos mas grandes que la plancha
 
             for (int i = 0; i < elementos.Count; i++)
             {
-                if (elementos.ElementAt(i).alto > tabla.alto || elementos.ElementAt(i).largo > tabla.largo)
+                if (elementos.ElementAt(i).alto > plancha.alto || elementos.ElementAt(i).largo > plancha.largo)
                 {
                     elementos.RemoveAt(i);
                     --i;
@@ -118,6 +90,16 @@ namespace IntentoTP1
             {
 
                 //comprobar que la posicion encaja y removar si no encaja, Si el elemento no encaja y la lista de posicones es igual a 1 terminar: TODO
+                if ((lstposicionEspacioLibres.ElementAt(0).largo < elementos.ElementAt(0).largo || lstposicionEspacioLibres.ElementAt(0).alto < elementos.ElementAt(0).alto)
+                    &&
+                    (lstposicionEspacioLibres.ElementAt(0).largo > elementos.ElementAt(0).alto && lstposicionEspacioLibres.ElementAt(0).alto > elementos.ElementAt(0).largo))
+                {
+                    int aux;
+                    aux = elementos.ElementAt(0).alto;
+                    elementos.ElementAt(0).alto = elementos.ElementAt(0).largo;
+                    elementos.ElementAt(0).largo = aux;
+                }
+
 
                 if (lstposicionEspacioLibres.ElementAt(0).largo < elementos.ElementAt(0).largo || lstposicionEspacioLibres.ElementAt(0).alto < elementos.ElementAt(0).alto)
                 {
@@ -128,6 +110,7 @@ namespace IntentoTP1
                 {
                     break;
                 }
+
                 //////////////////////////////////////////////////////////////////////////////
 
 
@@ -153,7 +136,7 @@ namespace IntentoTP1
                 posicionEspacioLibre2.alto = lstposicionEspacioLibres.ElementAt(0).alto - posicionEspacioLibre2.y;
 
                 // posicionEspacioLibre2.largo = lstposicionEspacioLibres.ElementAt(0).largo - posicionEspacioLibre2.x;
-                posicionEspacioLibre2.largo = tabla.largo - posicionEspacioLibre2.x;
+                posicionEspacioLibre2.largo = plancha.largo - posicionEspacioLibre2.x;
 
 
                 //crear otra posicion
@@ -167,7 +150,7 @@ namespace IntentoTP1
                 posicionEspacioLibre1.alto = elementosEmpacados.ElementAt(elementosEmpacados.Count - 1).alto;
 
                 //  posicionEspacioLibre1.largo = lstposicionEspacioLibres.ElementAt(0).largo - posicionEspacioLibre1.x;
-                posicionEspacioLibre1.largo = tabla.largo - posicionEspacioLibre1.x;
+                posicionEspacioLibre1.largo = plancha.largo - posicionEspacioLibre1.x;
 
 
                 //quitar la ultima posicion(la posicion original)
@@ -187,19 +170,25 @@ namespace IntentoTP1
                 }
             }
 
+
+            int sumaAreaElementosEmpacados=0;
+
             for (int i = 0; i < elementosEmpacados.Count; i++)
             {
+                //Dibujar los rectangulos:
                 DibujarRectangulo(elementosEmpacados.ElementAt(i).x, elementosEmpacados.ElementAt(i).y,
                     elementosEmpacados.ElementAt(i).largo, elementosEmpacados.ElementAt(i).alto);
 
+                //Mostrando en el listView
+                listBoxElementosEmpacados.Items.Add("Elemento:" + (i + 1) + ":" + "Largo: " + elementosEmpacados.ElementAt(i).largo +
+                    "Alto: " + elementosEmpacados.ElementAt(i).alto);
+
+                //calcular el area de elementos empaquetados:
+                sumaAreaElementosEmpacados += elementosEmpacados.ElementAt(i).area;
             }
 
-            //Mostrando en el listView
-            for (int i=0; i< listaElementosEmpacados.Count;i++) {
+            lblEspacioNoOcupado.Text = (((plancha.alto * plancha.largo) - sumaAreaElementosEmpacados)*100/ (plancha.alto * plancha.largo)).ToString()+"%";
 
-                listBoxElementosEmpacados.Items.Add("Elemento:"+(i+1)+":"+"Largo: "+listaElementosEmpacados.ElementAt(i).largo+
-                    "Alto: "+listaElementosEmpacados.ElementAt(i).alto);
-            }
         }
 
         public void DibujarRectangulo(int x, int y, int largo, int alto)
@@ -220,10 +209,10 @@ namespace IntentoTP1
             Size size = new Size(largo, alto);
             pictureBox1.Size = size;
 
-            //Definiendo la tabla
-            tabla = new PosicionEspacioLibre(largo, alto);
-            tabla.x = 0;
-            tabla.y = 0;
+            //Definiendo la plancha
+            plancha = new PosicionEspacioLibre(largo, alto);
+            plancha.x = 0;
+            plancha.y = 0;
 
             //
         }
