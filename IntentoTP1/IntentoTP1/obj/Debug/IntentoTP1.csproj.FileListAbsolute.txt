@@ -17,3 +17,4 @@ E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\obj\De
 E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\obj\Debug\IntentoTP1.csproj.CoreCompileInputs.cache
 E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\obj\Debug\IntentoTP1.exe
 E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\obj\Debug\IntentoTP1.pdb
+E:\Proyectos\Complejidad Algoritmica\TP-Bin-Packing\IntentoTP1\IntentoTP1\obj\Debug\IntentoTP1.csprojAssemblyReference.cache

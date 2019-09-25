@@ -49,6 +49,7 @@
             this.btnNuevo = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.lblEspacioNoOcupado = new System.Windows.Forms.Label();
+            this.btnAbrirTxt = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -148,9 +149,9 @@
             // pictureBox1
             // 
             this.pictureBox1.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.pictureBox1.Location = new System.Drawing.Point(12, 18);
+            this.pictureBox1.Location = new System.Drawing.Point(12, 51);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(225, 182);
+            this.pictureBox1.Size = new System.Drawing.Size(310, 255);
             this.pictureBox1.TabIndex = 13;
             this.pictureBox1.TabStop = false;
             // 
@@ -237,11 +238,22 @@
             this.lblEspacioNoOcupado.TabIndex = 22;
             this.lblEspacioNoOcupado.Text = "100%";
             // 
+            // btnAbrirTxt
+            // 
+            this.btnAbrirTxt.Location = new System.Drawing.Point(12, 12);
+            this.btnAbrirTxt.Name = "btnAbrirTxt";
+            this.btnAbrirTxt.Size = new System.Drawing.Size(148, 23);
+            this.btnAbrirTxt.TabIndex = 23;
+            this.btnAbrirTxt.Text = "Abrir un txt de elementos";
+            this.btnAbrirTxt.UseVisualStyleBackColor = true;
+            this.btnAbrirTxt.Click += new System.EventHandler(this.BtnAbrirTxt_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1197, 643);
+            this.Controls.Add(this.btnAbrirTxt);
             this.Controls.Add(this.lblEspacioNoOcupado);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.btnNuevo);
@@ -295,6 +307,7 @@
         private System.Windows.Forms.Button btnNuevo;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label lblEspacioNoOcupado;
+        private System.Windows.Forms.Button btnAbrirTxt;
     }
 }
 

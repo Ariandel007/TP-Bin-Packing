@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,15 @@ namespace IntentoTP1
     {
         PosicionEspacioLibre plancha;
         List<Elemento> elementos = new List<Elemento>();
+
+        //Lista de elementos empacados
+        List<Elemento> elementosEmpacados = new List<Elemento>();
+
+        bool estadoNivel = false;
+
+
+        string[] lines;
+
 
         public Form1()
         {
@@ -35,6 +45,21 @@ namespace IntentoTP1
 
         }
 
+        private void ComprobarEspaciosLibres(List<PosicionEspacioLibre> lstposicionEspacioLibres)
+        {
+            if (lstposicionEspacioLibres.Count==0)
+            {
+                return;
+            }
+
+            else if (lstposicionEspacioLibres.ElementAt(0).largo < elementos.ElementAt(0).largo || lstposicionEspacioLibres.ElementAt(0).alto < elementos.ElementAt(0).alto)
+            {
+                lstposicionEspacioLibres.RemoveAt(0);
+                estadoNivel = true;
+                ComprobarEspaciosLibres(lstposicionEspacioLibres);
+            }
+        }
+
         private void ButtonIniciarAlgoritmo_Click(object sender, EventArgs e)
         {
 
@@ -43,15 +68,9 @@ namespace IntentoTP1
 
 
             ////Creando las lista de elementos:
-
-            //Creando la lista posiciones de espacios libres
-
             List<PosicionEspacioLibre> lstposicionEspacioLibres = new List<PosicionEspacioLibre>();
+
             lstposicionEspacioLibres.Add(new PosicionEspacioLibre(plancha.largo, plancha.alto));
-
-            //Lista de elementos empacados
-            List<Elemento> elementosEmpacados = new List<Elemento>();
-
 
 
             ///ACA INICIA EL ALGORITMO:
@@ -61,15 +80,16 @@ namespace IntentoTP1
             //ordenamiento descendente por factor de encaje
             //elementos = elementos.OrderByDescending(e => e.factorDeEncaje).ToList();
 
-            //Hallar el elemento con menor altura:
-            int alturaDelElementoMenosAlto = elementos.Min(el => el.alto);
 
             //ordenamiento descendente por factor de encaje, luego por area, luego por largo, luego por alto
-            elementos = elementos.OrderByDescending(ef => ef.factorDeEncaje)
-                .ThenByDescending(ea => ea.area)
-                .ThenByDescending(ela => ela.largo)
-                .ThenByDescending(eal => eal.alto)
-                .ToList();
+            //elementos = elementos.OrderByDescending(ef => ef.factorDeEncaje)
+            //    .ThenByDescending(ea => ea.area)
+            //    .ThenByDescending(ela => ela.largo)
+            //    .ThenByDescending(eal => eal.alto)
+            //    .ToList();
+
+            //si lo hacemos por alto se vuelve un algortimo shelf
+            elementos = elementos.OrderByDescending(ef => ef.alto).ToList();
 
             //realizar mas ordenamientos de desempate: TODO
 
@@ -85,11 +105,20 @@ namespace IntentoTP1
                 }
             }
 
+            //Hallar el elemento con menor altura:
+            int alturaDelElementoMenosAlto = elementos.Min(el => el.alto);
 
-            while (elementos.Count > 0 && lstposicionEspacioLibres.Count > 0)
+            //elemento nuevo nivel
+            Elemento elementoUltimoNuevoNivel=new Elemento(0,0);
+
+            while (elementos.Count > 0)
             {
+                if(elementos.Count==1)
+                {
+                    MessageBox.Show("excelente");
+                }
 
-                //comprobar que la posicion encaja y removar si no encaja, Si el elemento no encaja y la lista de posicones es igual a 1 terminar: TODO
+                //rotar si es que asi encaja
                 if ((lstposicionEspacioLibres.ElementAt(0).largo < elementos.ElementAt(0).largo || lstposicionEspacioLibres.ElementAt(0).alto < elementos.ElementAt(0).alto)
                     &&
                     (lstposicionEspacioLibres.ElementAt(0).largo > elementos.ElementAt(0).alto && lstposicionEspacioLibres.ElementAt(0).alto > elementos.ElementAt(0).largo))
@@ -100,18 +129,18 @@ namespace IntentoTP1
                     elementos.ElementAt(0).largo = aux;
                 }
 
-
-                if (lstposicionEspacioLibres.ElementAt(0).largo < elementos.ElementAt(0).largo || lstposicionEspacioLibres.ElementAt(0).alto < elementos.ElementAt(0).alto)
+                this.ComprobarEspaciosLibres(lstposicionEspacioLibres);
+                // si se eliminaron los espacios
+                if (lstposicionEspacioLibres.Count == 0 && elementos.Count > 0)
                 {
-                    lstposicionEspacioLibres.RemoveAt(0);
+                    PosicionEspacioLibre posicionEspacioLibreExtra = new PosicionEspacioLibre();
+                    posicionEspacioLibreExtra.x = elementoUltimoNuevoNivel.x;
+                    posicionEspacioLibreExtra.y = elementoUltimoNuevoNivel.y + elementoUltimoNuevoNivel.alto;
+                    posicionEspacioLibreExtra.largo = plancha.largo;
+                    posicionEspacioLibreExtra.alto = plancha.alto - (posicionEspacioLibreExtra.y);
+                    lstposicionEspacioLibres.Add(posicionEspacioLibreExtra);
                 }
 
-                if (lstposicionEspacioLibres.Count == 0)
-                {
-                    break;
-                }
-
-                //////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -120,6 +149,12 @@ namespace IntentoTP1
 
                 //añadir a los elementos empacados
                 elementosEmpacados.Add(elementos.ElementAt(0));
+
+                //añadir a  elemento nuevo nivel
+                if(estadoNivel==true)
+                {
+                    elementoUltimoNuevoNivel = elementosEmpacados.ElementAt(elementosEmpacados.Count-1);
+                }
 
                 //eliminar de la primera posicion de elementos:
                 elementos.RemoveAt(0);
@@ -131,11 +166,48 @@ namespace IntentoTP1
                 posicionEspacioLibre2.x = elementosEmpacados.ElementAt(elementosEmpacados.Count - 1).x;
                 posicionEspacioLibre2.y = elementosEmpacados.ElementAt(elementosEmpacados.Count - 1).y + elementosEmpacados.ElementAt(elementosEmpacados.Count - 1).alto;
 
-                ////
+
+                if (lstposicionEspacioLibres.ElementAt(0).alto< posicionEspacioLibre2.y)
+                {
+                    lstposicionEspacioLibres.RemoveAt(0);
+                }
+
+
+                ////////////////////////////////////////////////////
+                if (lstposicionEspacioLibres.Count == 0 && elementos.Count > 0)
+                {
+                    PosicionEspacioLibre posicionEspacioLibreExtra = new PosicionEspacioLibre();
+                    posicionEspacioLibreExtra.x = elementoUltimoNuevoNivel.x;
+                    posicionEspacioLibreExtra.y = elementoUltimoNuevoNivel.y + elementoUltimoNuevoNivel.alto;
+                    posicionEspacioLibreExtra.largo = plancha.largo;
+                    posicionEspacioLibreExtra.alto = plancha.alto - (posicionEspacioLibreExtra.y);
+                    lstposicionEspacioLibres.Add(posicionEspacioLibreExtra);
+
+                }
+
+                //si salio negativa la altura
+                if (lstposicionEspacioLibres.ElementAt(0).alto < posicionEspacioLibre2.y)
+                {
+                    lstposicionEspacioLibres.RemoveAt(0);
+                }
+
+                //si se eliminaron los espacios disponibles pero aun quedan elementos
+                if (lstposicionEspacioLibres.Count == 0 && elementos.Count > 0)
+                {
+                    PosicionEspacioLibre posicionEspacioLibreExtra = new PosicionEspacioLibre();
+                    posicionEspacioLibreExtra.x = elementoUltimoNuevoNivel.x;
+                    posicionEspacioLibreExtra.y = elementoUltimoNuevoNivel.y + elementoUltimoNuevoNivel.alto;
+                    posicionEspacioLibreExtra.largo = plancha.largo;
+                    posicionEspacioLibreExtra.alto = plancha.alto - (posicionEspacioLibreExtra.y);
+                    lstposicionEspacioLibres.Add(posicionEspacioLibreExtra);
+                }
+
+                //si es emnor a lo que queda
+                if (lstposicionEspacioLibres.Count==0||lstposicionEspacioLibres.ElementAt(lstposicionEspacioLibres.Count - 1).alto < alturaDelElementoMenosAlto)
+                    break;
 
                 posicionEspacioLibre2.alto = lstposicionEspacioLibres.ElementAt(0).alto - posicionEspacioLibre2.y;
 
-                // posicionEspacioLibre2.largo = lstposicionEspacioLibres.ElementAt(0).largo - posicionEspacioLibre2.x;
                 posicionEspacioLibre2.largo = plancha.largo - posicionEspacioLibre2.x;
 
 
@@ -156,18 +228,25 @@ namespace IntentoTP1
                 //quitar la ultima posicion(la posicion original)
                 lstposicionEspacioLibres.RemoveAt(0);
 
-                //si en posicion 2 el largo es menor que el elemento de menor alto
-                if (posicionEspacioLibre2.alto < alturaDelElementoMenosAlto)
-                {
-                    posicionEspacioLibre1.alto += posicionEspacioLibre2.alto;
-                    lstposicionEspacioLibres.Insert(0, posicionEspacioLibre1);
+                //lstposicionEspacioLibres.Insert(0, posicionEspacioLibre2);
+                //lstposicionEspacioLibres.Insert(0, posicionEspacioLibre1);
 
-                }
-                else//de lo contario insertar al final las dos posiciones
-                {
-                    lstposicionEspacioLibres.Insert(0, posicionEspacioLibre2);
-                    lstposicionEspacioLibres.Insert(0, posicionEspacioLibre1);
-                }
+                lstposicionEspacioLibres.Insert(0, posicionEspacioLibre2);
+                lstposicionEspacioLibres.Insert(0, posicionEspacioLibre1);
+
+                //si en posicion 2 el alto es menor que el elemento de menor alto
+                //if (posicionEspacioLibre2.alto < alturaDelElementoMenosAlto)
+                //{
+                //    posicionEspacioLibre1.alto += posicionEspacioLibre2.alto;
+                //    lstposicionEspacioLibres.Insert(0, posicionEspacioLibre1);
+
+                //}
+                //else//de lo contario insertar al final las dos posiciones
+                //{
+                //    lstposicionEspacioLibres.Insert(0, posicionEspacioLibre2);
+                //    lstposicionEspacioLibres.Insert(0, posicionEspacioLibre1);
+                //}
+                estadoNivel = false;
             }
 
 
@@ -195,7 +274,7 @@ namespace IntentoTP1
         {
             Graphics rectangulo;
             rectangulo = pictureBox1.CreateGraphics();
-            Pen lapiz = new Pen(Color.Red);
+            Pen lapiz = new Pen(Color.DarkBlue);
             //x,y,largo,altura
             rectangulo.DrawRectangle(lapiz, x, y, largo, alto);
         }
@@ -213,7 +292,6 @@ namespace IntentoTP1
             plancha = new PosicionEspacioLibre(largo, alto);
             plancha.x = 0;
             plancha.y = 0;
-
             //
         }
 
@@ -234,6 +312,72 @@ namespace IntentoTP1
             Form1 NewForm = new Form1();
             NewForm.Show();
             this.Dispose(false);
+        }
+
+        private void BtnAbrirTxt_Click(object sender, EventArgs e)
+        {
+            var fileContent = string.Empty;
+            var filePath = string.Empty;
+
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = "e:\\";
+                openFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 2;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    //obtener el path del archivo especificado
+                    filePath = openFileDialog.FileName;
+
+                    //Read the contents of the file into a stream
+                    var fileStream = openFileDialog.OpenFile();
+
+                    using (StreamReader reader = new StreamReader(fileStream))
+                    {
+                         lines = System.IO.File.ReadAllLines(@filePath);
+                    }
+                }
+            }
+            try
+            {
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    string[] split = lines[i].Split(new Char[] { ' ' });
+
+                    if (i == 0)
+                    {
+                        int largo = int.Parse(split[0]);
+                        int alto = int.Parse(split[1]);
+
+                        //Modificar tamaño  de picturebox
+                        Size size = new Size(largo, alto);
+                        pictureBox1.Size = size;
+
+                        //Definiendo la plancha
+                        plancha = new PosicionEspacioLibre(largo, alto);
+                        plancha.x = 0;
+                        plancha.y = 0;
+                        //
+                    }
+                    else
+                    {
+                        int largo = int.Parse(split[0]);
+                        int alto = int.Parse(split[1]);
+                        Elemento elemento = new Elemento(largo, alto);
+                        elementos.Add(elemento);
+
+                        listBoxElementosAEmpacar.Items.Add("Elemento:" + elementos.Count + "Largo: " + elementos.ElementAt(elementos.Count - 1).largo + " Alto:" + elementos.ElementAt(elementos.Count - 1).alto);
+
+                    }
+
+                }
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
         }
     }
 }
