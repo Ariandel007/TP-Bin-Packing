@@ -119,28 +119,38 @@ namespace IntentoTP1
                 }
 
                 //rotar si es que asi encaja
-                if ((lstposicionEspacioLibres.ElementAt(0).largo < elementos.ElementAt(0).largo || lstposicionEspacioLibres.ElementAt(0).alto < elementos.ElementAt(0).alto)
-                    &&
-                    (lstposicionEspacioLibres.ElementAt(0).largo > elementos.ElementAt(0).alto && lstposicionEspacioLibres.ElementAt(0).alto > elementos.ElementAt(0).largo))
-                {
-                    int aux;
-                    aux = elementos.ElementAt(0).alto;
-                    elementos.ElementAt(0).alto = elementos.ElementAt(0).largo;
-                    elementos.ElementAt(0).largo = aux;
-                }
+                //if ((lstposicionEspacioLibres.ElementAt(0).largo < elementos.ElementAt(0).largo || lstposicionEspacioLibres.ElementAt(0).alto < elementos.ElementAt(0).alto)
+                //    &&
+                //    (lstposicionEspacioLibres.ElementAt(0).largo > elementos.ElementAt(0).alto && lstposicionEspacioLibres.ElementAt(0).alto > elementos.ElementAt(0).largo))
+                //{
+                //    int aux;
+                //    aux = elementos.ElementAt(0).alto;
+                //    elementos.ElementAt(0).alto = elementos.ElementAt(0).largo;
+                //    elementos.ElementAt(0).largo = aux;
+                //}
 
                 this.ComprobarEspaciosLibres(lstposicionEspacioLibres);
+
+                //añadir a  elemento nuevo nivel
+
                 // si se eliminaron los espacios
                 if (lstposicionEspacioLibres.Count == 0 && elementos.Count > 0)
                 {
                     PosicionEspacioLibre posicionEspacioLibreExtra = new PosicionEspacioLibre();
-                    posicionEspacioLibreExtra.x = elementoUltimoNuevoNivel.x;
+//                    posicionEspacioLibreExtra.x = elementoUltimoNuevoNivel.x;
+                    posicionEspacioLibreExtra.x = 0;
                     posicionEspacioLibreExtra.y = elementoUltimoNuevoNivel.y + elementoUltimoNuevoNivel.alto;
                     posicionEspacioLibreExtra.largo = plancha.largo;
                     posicionEspacioLibreExtra.alto = plancha.alto - (posicionEspacioLibreExtra.y);
                     lstposicionEspacioLibres.Add(posicionEspacioLibreExtra);
                 }
 
+                if (estadoNivel == true)
+                {
+                    elementoUltimoNuevoNivel = elementos.ElementAt(0);
+                    // elementoUltimoNuevoNivel.x = 0;
+                    estadoNivel = false;
+                }
 
 
 
@@ -150,11 +160,7 @@ namespace IntentoTP1
                 //añadir a los elementos empacados
                 elementosEmpacados.Add(elementos.ElementAt(0));
 
-                //añadir a  elemento nuevo nivel
-                if(estadoNivel==true)
-                {
-                    elementoUltimoNuevoNivel = elementosEmpacados.ElementAt(elementosEmpacados.Count-1);
-                }
+
 
                 //eliminar de la primera posicion de elementos:
                 elementos.RemoveAt(0);
@@ -228,9 +234,6 @@ namespace IntentoTP1
                 //quitar la ultima posicion(la posicion original)
                 lstposicionEspacioLibres.RemoveAt(0);
 
-                //lstposicionEspacioLibres.Insert(0, posicionEspacioLibre2);
-                //lstposicionEspacioLibres.Insert(0, posicionEspacioLibre1);
-
                 lstposicionEspacioLibres.Insert(0, posicionEspacioLibre2);
                 lstposicionEspacioLibres.Insert(0, posicionEspacioLibre1);
 
@@ -246,7 +249,6 @@ namespace IntentoTP1
                 //    lstposicionEspacioLibres.Insert(0, posicionEspacioLibre2);
                 //    lstposicionEspacioLibres.Insert(0, posicionEspacioLibre1);
                 //}
-                estadoNivel = false;
             }
 
 
