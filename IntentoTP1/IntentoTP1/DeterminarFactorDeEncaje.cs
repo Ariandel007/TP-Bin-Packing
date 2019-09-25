@@ -8,7 +8,7 @@ namespace IntentoTP1
 {
     class DeterminarFactorDeEncaje
     {
-        public void determinarFactorDeEncaje(List<Elemento> elementos, PosicionEspacioLibre posicionEspacioLibres)
+        public void determinarFactorDeEncaje(LinkedList<Elemento> elementos, PosicionEspacioLibre posicionEspacioLibres)
         {
             for (int i = 0; i < elementos.Count; i++)
             {
