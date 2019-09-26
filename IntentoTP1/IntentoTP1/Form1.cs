@@ -69,8 +69,6 @@ namespace IntentoTP1
 
         private void ButtonIniciarAlgoritmo_Click(object sender, EventArgs e)
         {
-
-
             DeterminarFactorDeEncaje algoritmo = new DeterminarFactorDeEncaje();
 
 
@@ -310,6 +308,132 @@ namespace IntentoTP1
             {
                 MessageBox.Show(ex.Message);
             }
+
+        }
+
+        private void BtnIniicarGuillotina_Click(object sender, EventArgs e)
+        {
+
+            DeterminarFactorDeEncaje algoritmo = new DeterminarFactorDeEncaje();
+
+
+            ////Creando las lista de elementos:
+            LinkedList<PosicionEspacioLibre> lstposicionEspacioLibres = new LinkedList<PosicionEspacioLibre>();
+
+            lstposicionEspacioLibres.AddLast(new PosicionEspacioLibre(plancha.largo, plancha.alto));
+
+
+            ///ACA INICIA EL ALGORITMO:
+
+            algoritmo.determinarFactorDeEncaje(elementos, lstposicionEspacioLibres.First.Value);
+
+            //ordenamiento descendente por factor de encaje, luego por area, luego por largo, luego por alto
+
+            elementos = new LinkedList<Elemento>(elementos.OrderByDescending(ef => ef.factorDeEncaje)
+                .ThenByDescending(ea => ea.area)
+                .ThenByDescending(ela => ela.largo)
+                .ThenByDescending(eal => eal.alto)
+                .ToList());
+
+            //realizar mas ordenamientos de desempate: TODO
+
+
+            //Quitar elementos mas grandes que la plancha
+
+            for (int i = 0; i < elementos.Count; i++)
+            {
+                if (elementos.ElementAt(i).alto > plancha.alto || elementos.ElementAt(i).largo > plancha.largo)
+                {
+                    elementos.Remove(elementos.ElementAt(i));
+                    --i;
+                }
+            }
+
+            //Hallar el elemento con menor altura:
+            int alturaDelElementoMenosAlto = elementos.Min(el => el.alto);
+
+            //elemento nuevo nivel
+            Elemento primerElementoUltimoNuevoNivel = new Elemento(0, 0);
+
+            while (elementos.Count > 0 && lstposicionEspacioLibres.Count > 0)
+            {
+
+                this.ComprobarEspaciosLibres(lstposicionEspacioLibres);
+
+                if (terminar)
+                {
+                    break;
+                }
+
+                //añadir elemento de primer nivel
+                if (estadoNivel == true)
+                {
+                    primerElementoUltimoNuevoNivel = elementos.First.Value;
+                    estadoNivel = false;
+                }
+
+
+
+                elementos.First.Value.x = lstposicionEspacioLibres.First.Value.x;
+                elementos.First.Value.y = lstposicionEspacioLibres.First.Value.y;
+
+                //añadir a los elementos empacados
+                elementosEmpacados.AddLast(elementos.First.Value);
+
+
+
+                //eliminar de la primera posicion de elementos:
+                elementos.RemoveFirst();
+
+                //crear posicion :
+                PosicionEspacioLibre posicionEspacioLibre2 = new PosicionEspacioLibre();
+
+                //definir origen:
+                posicionEspacioLibre2.x = 0;
+                posicionEspacioLibre2.y = primerElementoUltimoNuevoNivel.y + primerElementoUltimoNuevoNivel.alto;
+
+                posicionEspacioLibre2.alto = plancha.alto - (primerElementoUltimoNuevoNivel.alto + primerElementoUltimoNuevoNivel.y);
+
+                posicionEspacioLibre2.largo = plancha.largo;
+
+
+                //crear otra posicion
+                PosicionEspacioLibre posicionEspacioLibre1 = new PosicionEspacioLibre();
+
+                //definir origen:
+                posicionEspacioLibre1.x = elementosEmpacados.Last.Value.x + elementosEmpacados.Last.Value.largo;
+                posicionEspacioLibre1.y = primerElementoUltimoNuevoNivel.y;
+                //
+
+                posicionEspacioLibre1.alto = primerElementoUltimoNuevoNivel.alto;
+
+                posicionEspacioLibre1.largo = plancha.largo - posicionEspacioLibre1.x;
+
+
+                lstposicionEspacioLibres.RemoveFirst();
+
+                lstposicionEspacioLibres.AddFirst(posicionEspacioLibre2);
+                lstposicionEspacioLibres.AddFirst(posicionEspacioLibre1);
+            }
+
+
+            int sumaAreaElementosEmpacados = 0;
+
+            for (int i = 0; i < elementosEmpacados.Count; i++)
+            {
+                //Dibujar los rectangulos:
+                DibujarRectangulo(elementosEmpacados.ElementAt(i).x, elementosEmpacados.ElementAt(i).y,
+                    elementosEmpacados.ElementAt(i).largo, elementosEmpacados.ElementAt(i).alto);
+
+                //Mostrando en el listView
+                listBoxElementosEmpacados.Items.Add("Elemento:" + (i + 1) + ":" + "Largo: " + elementosEmpacados.ElementAt(i).largo +
+                    "Alto: " + elementosEmpacados.ElementAt(i).alto);
+
+                //calcular el area de elementos empaquetados:
+                sumaAreaElementosEmpacados += elementosEmpacados.ElementAt(i).area;
+            }
+
+            lblEspacioNoOcupado.Text = (((plancha.alto * plancha.largo) - sumaAreaElementosEmpacados) * 100 / (plancha.alto * plancha.largo)).ToString() + "%";
 
         }
     }

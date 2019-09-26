@@ -50,6 +50,7 @@
             this.label8 = new System.Windows.Forms.Label();
             this.lblEspacioNoOcupado = new System.Windows.Forms.Label();
             this.btnAbrirTxt = new System.Windows.Forms.Button();
+            this.btnIniciarGuillotina = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -172,7 +173,7 @@
             this.buttonIniciarAlgoritmo.Name = "buttonIniciarAlgoritmo";
             this.buttonIniciarAlgoritmo.Size = new System.Drawing.Size(160, 75);
             this.buttonIniciarAlgoritmo.TabIndex = 15;
-            this.buttonIniciarAlgoritmo.Text = "INICIAR PROCESO";
+            this.buttonIniciarAlgoritmo.Text = "INICIAR PROCESO SHELF";
             this.buttonIniciarAlgoritmo.UseVisualStyleBackColor = false;
             this.buttonIniciarAlgoritmo.Click += new System.EventHandler(this.ButtonIniciarAlgoritmo_Click);
             // 
@@ -248,11 +249,23 @@
             this.btnAbrirTxt.UseVisualStyleBackColor = true;
             this.btnAbrirTxt.Click += new System.EventHandler(this.BtnAbrirTxt_Click);
             // 
+            // btnIniciarGuillotina
+            // 
+            this.btnIniciarGuillotina.BackColor = System.Drawing.Color.Lime;
+            this.btnIniciarGuillotina.Location = new System.Drawing.Point(1025, 460);
+            this.btnIniciarGuillotina.Name = "btnIniciarGuillotina";
+            this.btnIniciarGuillotina.Size = new System.Drawing.Size(160, 75);
+            this.btnIniciarGuillotina.TabIndex = 24;
+            this.btnIniciarGuillotina.Text = "INICIAR PROCESO GUILLOTINA";
+            this.btnIniciarGuillotina.UseVisualStyleBackColor = false;
+            this.btnIniciarGuillotina.Click += new System.EventHandler(this.BtnIniicarGuillotina_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1197, 643);
+            this.Controls.Add(this.btnIniciarGuillotina);
             this.Controls.Add(this.btnAbrirTxt);
             this.Controls.Add(this.lblEspacioNoOcupado);
             this.Controls.Add(this.label8);
@@ -308,6 +321,7 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label lblEspacioNoOcupado;
         private System.Windows.Forms.Button btnAbrirTxt;
+        private System.Windows.Forms.Button btnIniciarGuillotina;
     }
 }
 
