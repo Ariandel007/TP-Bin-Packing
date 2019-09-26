@@ -19,8 +19,9 @@ namespace IntentoTP1
         //Lista de elementos empacados
         LinkedList<Elemento> elementosEmpacados = new LinkedList<Elemento>();
 
-        bool estadoNivel = false;
+        bool estadoNivel = true;
 
+        bool terminar = false;
 
         string[] lines;
 
@@ -47,17 +48,23 @@ namespace IntentoTP1
 
         private void ComprobarEspaciosLibres(LinkedList<PosicionEspacioLibre> lstposicionEspacioLibres)
         {
-            if (lstposicionEspacioLibres.Count==0)
+            if (lstposicionEspacioLibres.Count == 0)
             {
                 return;
             }
+            if (lstposicionEspacioLibres.First.Value.alto < elementos.First.Value.alto)
+            {
+                terminar = true;
+                return;
+            }
 
-            else if (lstposicionEspacioLibres.First.Value.largo < elementos.First.Value.largo || lstposicionEspacioLibres.First.Value.alto < elementos.First.Value.alto)
+            if (lstposicionEspacioLibres.First.Value.largo < elementos.First.Value.largo)
             {
                 lstposicionEspacioLibres.RemoveFirst();
                 estadoNivel = true;
                 ComprobarEspaciosLibres(lstposicionEspacioLibres);
             }
+
         }
 
         private void ButtonIniciarAlgoritmo_Click(object sender, EventArgs e)
@@ -82,14 +89,16 @@ namespace IntentoTP1
 
 
             //ordenamiento descendente por factor de encaje, luego por area, luego por largo, luego por alto
-            //elementos = elementos.OrderByDescending(ef => ef.factorDeEncaje)
+
+            //elementos = new LinkedList<Elemento>(elementos.OrderByDescending(ef => ef.factorDeEncaje)
             //    .ThenByDescending(ea => ea.area)
             //    .ThenByDescending(ela => ela.largo)
             //    .ThenByDescending(eal => eal.alto)
-            //    .ToList();
-
+            //    .ToList());
             //si lo hacemos por alto se vuelve un algortimo shelf
-            elementos = new LinkedList<Elemento>(elementos.OrderByDescending(ef => ef.alto).ToList());
+            elementos = new LinkedList<Elemento>(elementos.OrderByDescending(ef => ef.factorDeEncaje)
+                .ThenByDescending(ea => ea.alto)
+                .ToList());
             //realizar mas ordenamientos de desempate: TODO
 
 
@@ -108,35 +117,22 @@ namespace IntentoTP1
             int alturaDelElementoMenosAlto = elementos.Min(el => el.alto);
 
             //elemento nuevo nivel
-            Elemento elementoUltimoNuevoNivel=new Elemento(0,0);
+            Elemento primerElementoUltimoNuevoNivel = new Elemento(0, 0);
 
-            while (elementos.Count > 0)
+            while (elementos.Count > 0 && lstposicionEspacioLibres.Count > 0)
             {
-                if(elementos.Count==1)
-                {
-                    MessageBox.Show("excelente");
-                }
 
                 this.ComprobarEspaciosLibres(lstposicionEspacioLibres);
 
-                //añadir a  elemento nuevo nivel
-
-                // si se eliminaron los espacios
-                if (lstposicionEspacioLibres.Count == 0 && elementos.Count > 0)
+                if (terminar)
                 {
-                    PosicionEspacioLibre posicionEspacioLibreExtra = new PosicionEspacioLibre();
-//                    posicionEspacioLibreExtra.x = elementoUltimoNuevoNivel.x;
-                    posicionEspacioLibreExtra.x = 0;
-                    posicionEspacioLibreExtra.y = elementoUltimoNuevoNivel.y + elementoUltimoNuevoNivel.alto;
-                    posicionEspacioLibreExtra.largo = plancha.largo;
-                    posicionEspacioLibreExtra.alto = plancha.alto - (posicionEspacioLibreExtra.y);
-                    lstposicionEspacioLibres.AddLast(posicionEspacioLibreExtra);
+                    break;
                 }
 
+                //añadir elemento de primer nivel
                 if (estadoNivel == true)
                 {
-                    elementoUltimoNuevoNivel = elementos.First.Value;
-                    // elementoUltimoNuevoNivel.x = 0;
+                    primerElementoUltimoNuevoNivel = elementos.First.Value;
                     estadoNivel = false;
                 }
 
@@ -146,7 +142,7 @@ namespace IntentoTP1
                 elementos.First.Value.y = lstposicionEspacioLibres.First.Value.y;
 
                 //añadir a los elementos empacados
-                elementosEmpacados.AddLast(elementos.ElementAt(0));
+                elementosEmpacados.AddLast(elementos.First.Value);
 
 
 
@@ -157,52 +153,12 @@ namespace IntentoTP1
                 PosicionEspacioLibre posicionEspacioLibre2 = new PosicionEspacioLibre();
 
                 //definir origen:
-                posicionEspacioLibre2.x = elementosEmpacados.Last.Value.x;
-                posicionEspacioLibre2.y = elementosEmpacados.Last.Value.y + elementosEmpacados.Last.Value.alto;
+                posicionEspacioLibre2.x = 0;
+                posicionEspacioLibre2.y = primerElementoUltimoNuevoNivel.y + primerElementoUltimoNuevoNivel.alto;
 
+                posicionEspacioLibre2.alto = plancha.alto - (primerElementoUltimoNuevoNivel.alto + primerElementoUltimoNuevoNivel.y);
 
-                if (lstposicionEspacioLibres.First.Value.alto< posicionEspacioLibre2.y)
-                {
-                    lstposicionEspacioLibres.RemoveFirst();
-                }
-
-
-                ////////////////////////////////////////////////////
-                if (lstposicionEspacioLibres.Count == 0 && elementos.Count > 0)
-                {
-                    PosicionEspacioLibre posicionEspacioLibreExtra = new PosicionEspacioLibre();
-                    posicionEspacioLibreExtra.x = elementoUltimoNuevoNivel.x;
-                    posicionEspacioLibreExtra.y = elementoUltimoNuevoNivel.y + elementoUltimoNuevoNivel.alto;
-                    posicionEspacioLibreExtra.largo = plancha.largo;
-                    posicionEspacioLibreExtra.alto = plancha.alto - (posicionEspacioLibreExtra.y);
-                    lstposicionEspacioLibres.AddLast(posicionEspacioLibreExtra);
-
-                }
-
-                //si salio negativa la altura
-                if (lstposicionEspacioLibres.First.Value.alto < posicionEspacioLibre2.y)
-                {
-                    lstposicionEspacioLibres.RemoveFirst();
-                }
-
-                //si se eliminaron los espacios disponibles pero aun quedan elementos
-                if (lstposicionEspacioLibres.Count == 0 && elementos.Count > 0)
-                {
-                    PosicionEspacioLibre posicionEspacioLibreExtra = new PosicionEspacioLibre();
-                    posicionEspacioLibreExtra.x = elementoUltimoNuevoNivel.x;
-                    posicionEspacioLibreExtra.y = elementoUltimoNuevoNivel.y + elementoUltimoNuevoNivel.alto;
-                    posicionEspacioLibreExtra.largo = plancha.largo;
-                    posicionEspacioLibreExtra.alto = plancha.alto - (posicionEspacioLibreExtra.y);
-                    lstposicionEspacioLibres.AddLast(posicionEspacioLibreExtra);
-                }
-
-                //si es emnor a lo que queda
-                if (lstposicionEspacioLibres.Count==0||lstposicionEspacioLibres.Last.Value.alto < alturaDelElementoMenosAlto)
-                    break;
-
-                posicionEspacioLibre2.alto = lstposicionEspacioLibres.First.Value.alto - posicionEspacioLibre2.y;
-
-                posicionEspacioLibre2.largo = plancha.largo - posicionEspacioLibre2.x;
+                posicionEspacioLibre2.largo = plancha.largo;
 
 
                 //crear otra posicion
@@ -210,10 +166,10 @@ namespace IntentoTP1
 
                 //definir origen:
                 posicionEspacioLibre1.x = elementosEmpacados.Last.Value.x + elementosEmpacados.Last.Value.largo;
-                posicionEspacioLibre1.y = elementosEmpacados.Last.Value.y;
+                posicionEspacioLibre1.y = primerElementoUltimoNuevoNivel.y;
                 //
 
-                posicionEspacioLibre1.alto = elementosEmpacados.ElementAt(elementosEmpacados.Count - 1).alto;
+                posicionEspacioLibre1.alto = primerElementoUltimoNuevoNivel.alto;
 
                 posicionEspacioLibre1.largo = plancha.largo - posicionEspacioLibre1.x;
 
@@ -225,7 +181,7 @@ namespace IntentoTP1
             }
 
 
-            int sumaAreaElementosEmpacados=0;
+            int sumaAreaElementosEmpacados = 0;
 
             for (int i = 0; i < elementosEmpacados.Count; i++)
             {
@@ -241,9 +197,10 @@ namespace IntentoTP1
                 sumaAreaElementosEmpacados += elementosEmpacados.ElementAt(i).area;
             }
 
-            lblEspacioNoOcupado.Text = (((plancha.alto * plancha.largo) - sumaAreaElementosEmpacados)*100/ (plancha.alto * plancha.largo)).ToString()+"%";
+            lblEspacioNoOcupado.Text = (((plancha.alto * plancha.largo) - sumaAreaElementosEmpacados) * 100 / (plancha.alto * plancha.largo)).ToString() + "%";
 
         }
+
 
         public void DibujarRectangulo(int x, int y, int largo, int alto)
         {
@@ -277,7 +234,7 @@ namespace IntentoTP1
             Elemento elemento = new Elemento(largo, alto);
             elementos.AddLast(elemento);
 
-            listBoxElementosAEmpacar.Items.Add("Elemento:"+ elementos.Count + "Largo: "+elementos.ElementAt(elementos.Count-1).largo+" Alto:"+elementos.ElementAt(elementos.Count - 1).alto);
+            listBoxElementosAEmpacar.Items.Add("Elemento:" + elementos.Count + "Largo: " + elementos.ElementAt(elementos.Count - 1).largo + " Alto:" + elementos.ElementAt(elementos.Count - 1).alto);
 
 
         }
@@ -311,7 +268,7 @@ namespace IntentoTP1
 
                     using (StreamReader reader = new StreamReader(fileStream))
                     {
-                         lines = System.IO.File.ReadAllLines(@filePath);
+                        lines = System.IO.File.ReadAllLines(@filePath);
                     }
                 }
             }
@@ -348,7 +305,8 @@ namespace IntentoTP1
                     }
 
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
