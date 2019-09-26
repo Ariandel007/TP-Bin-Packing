@@ -351,9 +351,10 @@ namespace IntentoTP1
             //elemento nuevo nivel
             Elemento primerElementoUltimoNuevoNivel = new Elemento(0, 0);
 
+            LinkedList<PosicionEspacioLibre> listaOcupados = new LinkedList<PosicionEspacioLibre>();
 
             //funcion recursiva
-            guillotina(lstposicionEspacioLibres);
+            guillotina(lstposicionEspacioLibres, listaOcupados);
 
 
 
@@ -377,14 +378,14 @@ namespace IntentoTP1
 
         }
 
-        private void guillotina(LinkedList<PosicionEspacioLibre> lstposicionEspacioLibres)
+        private void guillotina(LinkedList<PosicionEspacioLibre> lstposicionEspacioLibres, LinkedList<PosicionEspacioLibre> listaOcupados)
         {
             if(elementos.Count > 0 && lstposicionEspacioLibres.Count > 0)
             {
                 //hacer algoritmo
-                for (int i=0;i<lstposicionEspacioLibres.Count;i++)
-                {
-                    if (elementos.First!=null && elementos.First.Value.largo<lstposicionEspacioLibres.Last.Value.largo /*&& elementos.First.Value.alto < lstposicionEspacioLibres.Last.Value.alto*/)
+               // for (int i=0;i<lstposicionEspacioLibres.Count;i++)
+                //{
+                    if (elementos.First!=null && elementos.First.Value.largo<lstposicionEspacioLibres.Last.Value.largo && elementos.First.Value.alto < lstposicionEspacioLibres.Last.Value.alto)
                     {
                         var ele= elementos.First.Value;
                         ele.x = lstposicionEspacioLibres.Last.Value.x;
@@ -392,7 +393,7 @@ namespace IntentoTP1
 
                         elementosEmpacados.AddLast(ele);
                         elementos.RemoveFirst();
-
+                        lstposicionEspacioLibres.RemoveFirst();
 
                         PosicionEspacioLibre posEspacio1 = new PosicionEspacioLibre();
                         posEspacio1.x = ele.x + ele.largo;
@@ -402,30 +403,22 @@ namespace IntentoTP1
 
 
                         PosicionEspacioLibre posEspacio2 = new PosicionEspacioLibre();
-                        posEspacio2.x = ele.x + ele.largo;
+                        posEspacio2.x = ele.x;
                         posEspacio2.y = ele.y + ele.alto;
                         posEspacio2.largo = plancha.largo - posEspacio2.x;
                         //dudas con altura, quisas tambien este mal eliminar al final el lstposicionEspacioLibres.First.Value;
-                        posEspacio2.alto = lstposicionEspacioLibres.First.Value.alto - posEspacio2.y;
+                        posEspacio2.alto = plancha.alto - posEspacio2.y;
 
-                        PosicionEspacioLibre posEspacio3 = new PosicionEspacioLibre();
-                        posEspacio3.x = ele.x;
-                        posEspacio3.y = ele.y + ele.alto;
-                        posEspacio3.largo = ele.largo;
-                        //dudas con altura, quisas tambien este mal eliminar al final el lstposicionEspacioLibres.First.Value;
-                        posEspacio2.alto = lstposicionEspacioLibres.First.Value.alto - posEspacio2.y;
+                        LinkedList<PosicionEspacioLibre> pos1=new LinkedList<PosicionEspacioLibre>();
+                        pos1.AddLast(posEspacio1);
+                        guillotina(pos1, listaOcupados);
+                        LinkedList<PosicionEspacioLibre> pos2 = new LinkedList<PosicionEspacioLibre>();
+                        pos2.AddLast(posEspacio2);
+                        guillotina(pos2, listaOcupados);
 
-                        lstposicionEspacioLibres.RemoveFirst();
-
-                        lstposicionEspacioLibres.AddLast(posEspacio1);
-                        guillotina(lstposicionEspacioLibres);
-                        lstposicionEspacioLibres.AddLast(posEspacio2);
-                        guillotina(lstposicionEspacioLibres);
-                        lstposicionEspacioLibres.AddLast(posEspacio3);
-                        guillotina(lstposicionEspacioLibres);
                     }
 
-                }
+                //}
             }
 
 
