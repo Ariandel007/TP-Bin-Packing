@@ -311,28 +311,24 @@ namespace IntentoTP1
 
         }
 
+
         private void BtnIniicarGuillotina_Click(object sender, EventArgs e)
         {
-
             DeterminarFactorDeEncaje algoritmo = new DeterminarFactorDeEncaje();
-
 
             ////Creando las lista de elementos:
             LinkedList<PosicionEspacioLibre> lstposicionEspacioLibres = new LinkedList<PosicionEspacioLibre>();
 
             lstposicionEspacioLibres.AddLast(new PosicionEspacioLibre(plancha.largo, plancha.alto));
 
-
-            ///ACA INICIA EL ALGORITMO:
-
             algoritmo.determinarFactorDeEncaje(elementos, lstposicionEspacioLibres.First.Value);
 
             //ordenamiento descendente por factor de encaje, luego por area, luego por largo, luego por alto
 
             elementos = new LinkedList<Elemento>(elementos.OrderByDescending(ef => ef.factorDeEncaje)
+                .ThenByDescending(eal => eal.alto)
                 .ThenByDescending(ea => ea.area)
                 .ThenByDescending(ela => ela.largo)
-                .ThenByDescending(eal => eal.alto)
                 .ToList());
 
             //realizar mas ordenamientos de desempate: TODO
@@ -355,66 +351,10 @@ namespace IntentoTP1
             //elemento nuevo nivel
             Elemento primerElementoUltimoNuevoNivel = new Elemento(0, 0);
 
-            while (elementos.Count > 0 && lstposicionEspacioLibres.Count > 0)
-            {
 
-                this.ComprobarEspaciosLibres(lstposicionEspacioLibres);
+            //funcion recursiva
+            guillotina(lstposicionEspacioLibres);
 
-                if (terminar)
-                {
-                    break;
-                }
-
-                //añadir elemento de primer nivel
-                if (estadoNivel == true)
-                {
-                    primerElementoUltimoNuevoNivel = elementos.First.Value;
-                    estadoNivel = false;
-                }
-
-
-
-                elementos.First.Value.x = lstposicionEspacioLibres.First.Value.x;
-                elementos.First.Value.y = lstposicionEspacioLibres.First.Value.y;
-
-                //añadir a los elementos empacados
-                elementosEmpacados.AddLast(elementos.First.Value);
-
-
-
-                //eliminar de la primera posicion de elementos:
-                elementos.RemoveFirst();
-
-                //crear posicion :
-                PosicionEspacioLibre posicionEspacioLibre2 = new PosicionEspacioLibre();
-
-                //definir origen:
-                posicionEspacioLibre2.x = 0;
-                posicionEspacioLibre2.y = primerElementoUltimoNuevoNivel.y + primerElementoUltimoNuevoNivel.alto;
-
-                posicionEspacioLibre2.alto = plancha.alto - (primerElementoUltimoNuevoNivel.alto + primerElementoUltimoNuevoNivel.y);
-
-                posicionEspacioLibre2.largo = plancha.largo;
-
-
-                //crear otra posicion
-                PosicionEspacioLibre posicionEspacioLibre1 = new PosicionEspacioLibre();
-
-                //definir origen:
-                posicionEspacioLibre1.x = elementosEmpacados.Last.Value.x + elementosEmpacados.Last.Value.largo;
-                posicionEspacioLibre1.y = primerElementoUltimoNuevoNivel.y;
-                //
-
-                posicionEspacioLibre1.alto = primerElementoUltimoNuevoNivel.alto;
-
-                posicionEspacioLibre1.largo = plancha.largo - posicionEspacioLibre1.x;
-
-
-                lstposicionEspacioLibres.RemoveFirst();
-
-                lstposicionEspacioLibres.AddFirst(posicionEspacioLibre2);
-                lstposicionEspacioLibres.AddFirst(posicionEspacioLibre1);
-            }
 
 
             int sumaAreaElementosEmpacados = 0;
@@ -434,6 +374,60 @@ namespace IntentoTP1
             }
 
             lblEspacioNoOcupado.Text = (((plancha.alto * plancha.largo) - sumaAreaElementosEmpacados) * 100 / (plancha.alto * plancha.largo)).ToString() + "%";
+
+        }
+
+        private void guillotina(LinkedList<PosicionEspacioLibre> lstposicionEspacioLibres)
+        {
+            if(elementos.Count > 0 && lstposicionEspacioLibres.Count > 0)
+            {
+                //hacer algoritmo
+                for (int i=0;i<lstposicionEspacioLibres.Count;i++)
+                {
+                    if (elementos.First!=null && elementos.First.Value.largo<lstposicionEspacioLibres.Last.Value.largo /*&& elementos.First.Value.alto < lstposicionEspacioLibres.Last.Value.alto*/)
+                    {
+                        var ele= elementos.First.Value;
+                        ele.x = lstposicionEspacioLibres.Last.Value.x;
+                        ele.y = lstposicionEspacioLibres.Last.Value.y;
+
+                        elementosEmpacados.AddLast(ele);
+                        elementos.RemoveFirst();
+
+
+                        PosicionEspacioLibre posEspacio1 = new PosicionEspacioLibre();
+                        posEspacio1.x = ele.x + ele.largo;
+                        posEspacio1.y = ele.y;
+                        posEspacio1.largo = plancha.largo - posEspacio1.x;
+                        posEspacio1.alto = ele.alto;
+
+
+                        PosicionEspacioLibre posEspacio2 = new PosicionEspacioLibre();
+                        posEspacio2.x = ele.x + ele.largo;
+                        posEspacio2.y = ele.y + ele.alto;
+                        posEspacio2.largo = plancha.largo - posEspacio2.x;
+                        //dudas con altura, quisas tambien este mal eliminar al final el lstposicionEspacioLibres.First.Value;
+                        posEspacio2.alto = lstposicionEspacioLibres.First.Value.alto - posEspacio2.y;
+
+                        PosicionEspacioLibre posEspacio3 = new PosicionEspacioLibre();
+                        posEspacio3.x = ele.x;
+                        posEspacio3.y = ele.y + ele.alto;
+                        posEspacio3.largo = ele.largo;
+                        //dudas con altura, quisas tambien este mal eliminar al final el lstposicionEspacioLibres.First.Value;
+                        posEspacio2.alto = lstposicionEspacioLibres.First.Value.alto - posEspacio2.y;
+
+                        lstposicionEspacioLibres.RemoveFirst();
+
+                        lstposicionEspacioLibres.AddLast(posEspacio1);
+                        guillotina(lstposicionEspacioLibres);
+                        lstposicionEspacioLibres.AddLast(posEspacio2);
+                        guillotina(lstposicionEspacioLibres);
+                        lstposicionEspacioLibres.AddLast(posEspacio3);
+                        guillotina(lstposicionEspacioLibres);
+                    }
+
+                }
+            }
+
 
         }
     }
