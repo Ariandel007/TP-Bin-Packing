@@ -19,6 +19,10 @@ namespace IntentoTP1
         //Lista de elementos empacados
         LinkedList<Elemento> elementosEmpacados = new LinkedList<Elemento>();
 
+        //lista de paquetes, para el algoeritmo guillotina
+        List<Paquete> paquetes = new List<Paquete>();
+
+
         bool estadoNivel = true;
 
         bool terminar = false;
@@ -52,11 +56,7 @@ namespace IntentoTP1
             {
                 return;
             }
-            if (lstposicionEspacioLibres.First.Value.alto < elementos.First.Value.alto)
-            {
-                terminar = true;
-                return;
-            }
+
 
             if (lstposicionEspacioLibres.First.Value.largo < elementos.First.Value.largo)
             {
@@ -69,7 +69,6 @@ namespace IntentoTP1
 
         private void ButtonIniciarAlgoritmo_Click(object sender, EventArgs e)
         {
-            DeterminarFactorDeEncaje algoritmo = new DeterminarFactorDeEncaje();
 
 
             ////Creando las lista de elementos:
@@ -77,23 +76,7 @@ namespace IntentoTP1
 
             lstposicionEspacioLibres.AddLast(new PosicionEspacioLibre(plancha.largo, plancha.alto));
 
-
-            ///ACA INICIA EL ALGORITMO:
-
-            algoritmo.determinarFactorDeEncaje(elementos, lstposicionEspacioLibres.First.Value);
-
-            //ordenamiento descendente por factor de encaje
-            //elementos = elementos.OrderByDescending(e => e.factorDeEncaje).ToList();
-
-
-            //ordenamiento descendente por factor de encaje, luego por area, luego por largo, luego por alto
-
-            //elementos = new LinkedList<Elemento>(elementos.OrderByDescending(ef => ef.factorDeEncaje)
-            //    .ThenByDescending(ea => ea.area)
-            //    .ThenByDescending(ela => ela.largo)
-            //    .ThenByDescending(eal => eal.alto)
-            //    .ToList());
-            //si lo hacemos por alto se vuelve un algortimo shelf
+            //ordenador de mayor a menor por alto
             elementos = new LinkedList<Elemento>(elementos.OrderByDescending(ef => ef.factorDeEncaje)
                 .ThenByDescending(ea => ea.alto)
                 .ToList());
@@ -102,17 +85,13 @@ namespace IntentoTP1
 
             //Quitar elementos mas grandes que la plancha
 
-            for (int i = 0; i < elementos.Count; i++)
+            foreach (var ele in elementos)
             {
-                if (elementos.ElementAt(i).alto > plancha.alto || elementos.ElementAt(i).largo > plancha.largo)
+                if (ele.alto > plancha.alto || ele.largo > plancha.largo)
                 {
-                    elementos.Remove(elementos.ElementAt(i));
-                    --i;
+                    elementos.Remove(ele);
                 }
             }
-
-            //Hallar el elemento con menor altura:
-            int alturaDelElementoMenosAlto = elementos.Min(el => el.alto);
 
             //elemento nuevo nivel
             Elemento primerElementoUltimoNuevoNivel = new Elemento(0, 0);
@@ -121,11 +100,6 @@ namespace IntentoTP1
             {
 
                 this.ComprobarEspaciosLibres(lstposicionEspacioLibres);
-
-                if (terminar)
-                {
-                    break;
-                }
 
                 //añadir elemento de primer nivel
                 if (estadoNivel == true)
@@ -147,28 +121,20 @@ namespace IntentoTP1
                 //eliminar de la primera posicion de elementos:
                 elementos.RemoveFirst();
 
-                //crear posicion :
-                PosicionEspacioLibre posicionEspacioLibre2 = new PosicionEspacioLibre();
+                //crear otra posicion y definir posiciones
+                PosicionEspacioLibre posicionEspacioLibre2 = new PosicionEspacioLibre() { x = 0,
+                    y = primerElementoUltimoNuevoNivel.y + primerElementoUltimoNuevoNivel.alto,
+                    alto = plancha.alto - (primerElementoUltimoNuevoNivel.alto + primerElementoUltimoNuevoNivel.y),
+                    largo = plancha.largo
+                };
 
-                //definir origen:
-                posicionEspacioLibre2.x = 0;
-                posicionEspacioLibre2.y = primerElementoUltimoNuevoNivel.y + primerElementoUltimoNuevoNivel.alto;
-
-                posicionEspacioLibre2.alto = plancha.alto - (primerElementoUltimoNuevoNivel.alto + primerElementoUltimoNuevoNivel.y);
-
-                posicionEspacioLibre2.largo = plancha.largo;
-
-
-                //crear otra posicion
-                PosicionEspacioLibre posicionEspacioLibre1 = new PosicionEspacioLibre();
-
-                //definir origen:
-                posicionEspacioLibre1.x = elementosEmpacados.Last.Value.x + elementosEmpacados.Last.Value.largo;
-                posicionEspacioLibre1.y = primerElementoUltimoNuevoNivel.y;
-                //
-
-                posicionEspacioLibre1.alto = primerElementoUltimoNuevoNivel.alto;
-
+                //crear otra posicion y definir posiciones
+                PosicionEspacioLibre posicionEspacioLibre1 = new PosicionEspacioLibre(){
+                    x = elementosEmpacados.Last.Value.x + elementosEmpacados.Last.Value.largo,
+                    y = primerElementoUltimoNuevoNivel.y,
+                    alto = primerElementoUltimoNuevoNivel.alto,
+                   // largo = plancha.largo - x
+                };
                 posicionEspacioLibre1.largo = plancha.largo - posicionEspacioLibre1.x;
 
 
@@ -181,18 +147,16 @@ namespace IntentoTP1
 
             int sumaAreaElementosEmpacados = 0;
 
-            for (int i = 0; i < elementosEmpacados.Count; i++)
+            int c = 0;
+            foreach (var ele in elementosEmpacados)
             {
                 //Dibujar los rectangulos:
-                DibujarRectangulo(elementosEmpacados.ElementAt(i).x, elementosEmpacados.ElementAt(i).y,
-                    elementosEmpacados.ElementAt(i).largo, elementosEmpacados.ElementAt(i).alto);
-
+                DibujarRectangulo(ele.x, ele.y, ele.largo, ele.alto);
                 //Mostrando en el listView
-                listBoxElementosEmpacados.Items.Add("Elemento:" + (i + 1) + ":" + "Largo: " + elementosEmpacados.ElementAt(i).largo +
-                    "Alto: " + elementosEmpacados.ElementAt(i).alto);
-
+                listBoxElementosEmpacados.Items.Add("Elemento:" + (c + 1) + ":" + "Largo: " + ele.largo +"Alto: " + ele.alto);
                 //calcular el area de elementos empaquetados:
-                sumaAreaElementosEmpacados += elementosEmpacados.ElementAt(i).area;
+                sumaAreaElementosEmpacados += ele.area;
+                c++;
             }
 
             lblEspacioNoOcupado.Text = (((plancha.alto * plancha.largo) - sumaAreaElementosEmpacados) * 100 / (plancha.alto * plancha.largo)).ToString() + "%";
@@ -298,6 +262,9 @@ namespace IntentoTP1
                         Elemento elemento = new Elemento(largo, alto);
                         elementos.AddLast(elemento);
 
+                        Paquete paquete = new Paquete() { largo = largo, alto = alto };
+                        paquetes.Add(paquete);
+
                         listBoxElementosAEmpacar.Items.Add("Elemento:" + elementos.Count + "Largo: " + elementos.ElementAt(elementos.Count - 1).largo + " Alto:" + elementos.ElementAt(elementos.Count - 1).alto);
 
                     }
@@ -314,114 +281,42 @@ namespace IntentoTP1
 
         private void BtnIniicarGuillotina_Click(object sender, EventArgs e)
         {
-            DeterminarFactorDeEncaje algoritmo = new DeterminarFactorDeEncaje();
+            Arbolito arbolito = new Arbolito();
 
-            ////Creando las lista de elementos:
-            LinkedList<PosicionEspacioLibre> lstposicionEspacioLibres = new LinkedList<PosicionEspacioLibre>();
+            arbolito.paquetes = paquetes;
 
-            lstposicionEspacioLibres.AddLast(new PosicionEspacioLibre(plancha.largo, plancha.alto));
+            // ordernar de manera descendente segun el volumen
+            arbolito.paquetes.ForEach(x => x.volumen = (x.alto * x.largo));
+            arbolito.paquetes = arbolito.paquetes.OrderByDescending(x => x.volumen).ToList();
 
-            algoritmo.determinarFactorDeEncaje(elementos, lstposicionEspacioLibres.First.Value);
+            // inicilizar el nodo raiz con el tamaño de la plancha
 
-            //ordenamiento descendente por factor de encaje, luego por area, luego por largo, luego por alto
+            arbolito.nodoRaiz = new Nodo { alto = plancha.alto, largo = plancha.largo };
 
-            elementos = new LinkedList<Elemento>(elementos.OrderByDescending(ef => ef.factorDeEncaje)
-                .ThenByDescending(eal => eal.alto)
-                .ThenByDescending(ea => ea.area)
-                .ThenByDescending(ela => ela.largo)
-                .ToList());
-
-            //realizar mas ordenamientos de desempate: TODO
-
-
-            //Quitar elementos mas grandes que la plancha
-
-            for (int i = 0; i < elementos.Count; i++)
-            {
-                if (elementos.ElementAt(i).alto > plancha.alto || elementos.ElementAt(i).largo > plancha.largo)
-                {
-                    elementos.Remove(elementos.ElementAt(i));
-                    --i;
-                }
-            }
-
-            //Hallar el elemento con menor altura:
-            int alturaDelElementoMenosAlto = elementos.Min(el => el.alto);
-
-            //elemento nuevo nivel
-            Elemento primerElementoUltimoNuevoNivel = new Elemento(0, 0);
-
-            LinkedList<PosicionEspacioLibre> listaOcupados = new LinkedList<PosicionEspacioLibre>();
-
-            //funcion recursiva
-            guillotina(lstposicionEspacioLibres, listaOcupados);
-
-
+            arbolito.empacar();
 
             int sumaAreaElementosEmpacados = 0;
 
-            for (int i = 0; i < elementosEmpacados.Count; i++)
+
+            //mostrar paquetes
+            int c = 0;
+            foreach (var paquete in arbolito.paquetes)
             {
                 //Dibujar los rectangulos:
-                DibujarRectangulo(elementosEmpacados.ElementAt(i).x, elementosEmpacados.ElementAt(i).y,
-                    elementosEmpacados.ElementAt(i).largo, elementosEmpacados.ElementAt(i).alto);
-
-                //Mostrando en el listView
-                listBoxElementosEmpacados.Items.Add("Elemento:" + (i + 1) + ":" + "Largo: " + elementosEmpacados.ElementAt(i).largo +
-                    "Alto: " + elementosEmpacados.ElementAt(i).alto);
-
-                //calcular el area de elementos empaquetados:
-                sumaAreaElementosEmpacados += elementosEmpacados.ElementAt(i).area;
+                if (paquete.posicion != null)
+                {
+                    DibujarRectangulo(paquete.posicion.x, paquete.posicion.y, paquete.largo, paquete.alto);
+                    sumaAreaElementosEmpacados += (paquete.alto * paquete.largo);
+                    //Mostrando en el listView
+                    listBoxElementosEmpacados.Items.Add("Elementos: "+(c+1)+" Largo: " + paquete.largo + "Alto: " + paquete.posicion);
+                    c++;
+                }
+                
             }
 
             lblEspacioNoOcupado.Text = (((plancha.alto * plancha.largo) - sumaAreaElementosEmpacados) * 100 / (plancha.alto * plancha.largo)).ToString() + "%";
 
         }
 
-        private void guillotina(LinkedList<PosicionEspacioLibre> lstposicionEspacioLibres, LinkedList<PosicionEspacioLibre> listaOcupados)
-        {
-            if(elementos.Count > 0 && lstposicionEspacioLibres.Count > 0)
-            {
-                //hacer algoritmo
-               // for (int i=0;i<lstposicionEspacioLibres.Count;i++)
-                //{
-                    if (elementos.First!=null && elementos.First.Value.largo<lstposicionEspacioLibres.Last.Value.largo && elementos.First.Value.alto < lstposicionEspacioLibres.Last.Value.alto)
-                    {
-                        var ele= elementos.First.Value;
-                        ele.x = lstposicionEspacioLibres.Last.Value.x;
-                        ele.y = lstposicionEspacioLibres.Last.Value.y;
-
-                        elementosEmpacados.AddLast(ele);
-                        elementos.RemoveFirst();
-                        lstposicionEspacioLibres.RemoveFirst();
-
-                        PosicionEspacioLibre posEspacio1 = new PosicionEspacioLibre();
-                        posEspacio1.x = ele.x + ele.largo;
-                        posEspacio1.y = ele.y;
-                        posEspacio1.largo = plancha.largo - posEspacio1.x;
-                        posEspacio1.alto = ele.alto;
-
-
-                        PosicionEspacioLibre posEspacio2 = new PosicionEspacioLibre();
-                        posEspacio2.x = ele.x;
-                        posEspacio2.y = ele.y + ele.alto;
-                        posEspacio2.largo = plancha.largo - posEspacio2.x;
-                        //dudas con altura, quisas tambien este mal eliminar al final el lstposicionEspacioLibres.First.Value;
-                        posEspacio2.alto = plancha.alto - posEspacio2.y;
-
-                        LinkedList<PosicionEspacioLibre> pos1=new LinkedList<PosicionEspacioLibre>();
-                        pos1.AddLast(posEspacio1);
-                        guillotina(pos1, listaOcupados);
-                        LinkedList<PosicionEspacioLibre> pos2 = new LinkedList<PosicionEspacioLibre>();
-                        pos2.AddLast(posEspacio2);
-                        guillotina(pos2, listaOcupados);
-
-                    }
-
-                //}
-            }
-
-
-        }
     }
 }

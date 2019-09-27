@@ -10,6 +10,9 @@ namespace IntentoTP1
     {
         public int area { get; set; }
         public int factorDeEncaje { get; set; }
+        public int x { get; set; }
+
+        public int y { get; set; }
 
         public Elemento(int largo, int alto) : base(largo, alto)
         {

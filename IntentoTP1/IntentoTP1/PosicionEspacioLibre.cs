@@ -8,6 +8,10 @@ namespace IntentoTP1
 {
     class PosicionEspacioLibre : Rectangulo
     {
+        public int x { get; set; }
+
+        public int y { get; set; }
+
         public PosicionEspacioLibre()
         { }
         public PosicionEspacioLibre(int largo, int alto) : base(largo, alto)

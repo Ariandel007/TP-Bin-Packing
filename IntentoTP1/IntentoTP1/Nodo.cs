@@ -6,19 +6,14 @@ using System.Threading.Tasks;
 
 namespace IntentoTP1
 {
-    class Rectangulo
+    class Nodo
     {
-
+        public Nodo nodoDerecho { get; set; }
+        public Nodo nodoAbajo { get; set; }
+        public int x { get; set; }
+        public int y { get; set; }
         public int largo { get; set; }
-
         public int alto { get; set; }
-
-        public Rectangulo() { }
-        protected Rectangulo(int largo, int alto)
-        {
-            this.largo = largo;
-            this.alto = alto;
-        }
-
+        public bool estaOcupado { get; set; }
     }
 }
