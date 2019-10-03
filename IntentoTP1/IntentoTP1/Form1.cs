@@ -225,7 +225,6 @@ namespace IntentoTP1
                     //obtener el path del archivo especificado
                     filePath = openFileDialog.FileName;
 
-                    //Read the contents of the file into a stream
                     var fileStream = openFileDialog.OpenFile();
 
                     using (StreamReader reader = new StreamReader(fileStream))
